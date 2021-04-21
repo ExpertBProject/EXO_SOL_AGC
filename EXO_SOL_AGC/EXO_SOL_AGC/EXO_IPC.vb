@@ -18,11 +18,12 @@ Public Class EXO_IPC
             Dim oXML As String = ""
             Dim udoObj As EXO_Generales.EXO_UDO = Nothing
             oXML = objGlobal.funciones.leerEmbebido(Me.GetType(), "UDO_EXO_IPC.xml")
+            objGlobal.SBOApp.StatusBar.SetText("Validado: UDO_EXO_IPC", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
             objGlobal.refDi.comunes.LoadBDFromXML(oXML)
             If bValidado = True Then
-                objGlobal.SBOApp.StatusBar.SetText("Validado: UDO_EXO_IPC", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
-            Else
-                objGlobal.SBOApp.StatusBar.SetText("No Validado: UDO_EXO_IPC", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+                objGlobal.SBOApp.StatusBar.SetText("Validado: UDO_EXO_IPC", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
+                'Else
+                '    objGlobal.SBOApp.StatusBar.SetText("No Validado: UDO_EXO_IPC", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
             End If
 
         End If

@@ -16,13 +16,13 @@ Public Class EXO_IPCG
             Dim oXML As String = ""
             Dim udoObj As EXO_Generales.EXO_UDO = Nothing
             oXML = objGlobal.funciones.leerEmbebido(Me.GetType(), "UDF_EXO_ODRF.xml")
+            objGlobal.SBOApp.StatusBar.SetText("Validando: UDF_EXO_ODRF", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
             bValidado = objGlobal.refDi.comunes.LoadBDFromXML(oXML)
             If bValidado = True Then
-                objGlobal.SBOApp.StatusBar.SetText("Validado: UDF_EXO_ODRF", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
-            Else
-                objGlobal.SBOApp.StatusBar.SetText("No Validado: UDF_EXO_ODRF", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+                objGlobal.SBOApp.StatusBar.SetText("Validado: UDF_EXO_ODRF", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
+                'Else
+                '    objGlobal.SBOApp.StatusBar.SetText("No Validado: UDF_EXO_ODRF", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
             End If
-
         End If
     End Sub
     Private Sub cargamenu()
