@@ -14,6 +14,7 @@ Public Class EXO_COMPRAS
 
         If actualizar Then
             cargaCampos()
+            GenerarParametros()
         End If
     End Sub
     Private Sub cargaCampos()
@@ -28,6 +29,25 @@ Public Class EXO_COMPRAS
                 objGlobal.SBOApp.StatusBar.SetText("Validado: UDF_EXO_OPCH", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
                 'Else
                 '    objGlobal.SBOApp.StatusBar.SetText("No Validado: UDF_EXO_OPCH", SAPbouiCOM.BoMessageTime.bmt_Medium, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+            End If
+        End If
+    End Sub
+    Private Sub GenerarParametros()
+        If objGlobal.refDi.comunes.esAdministrador Then
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail", "facturas@solariaenergia.com")
+            End If
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_US") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_US", "facturas@solariaenergia.com")
+            End If
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_Pass") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_Pass", "Cud06785")
+            End If
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_SMTP") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_SMTP", "smtp.office365.com")
+            End If
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_Port") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_Port", "587")
             End If
         End If
     End Sub
@@ -393,7 +413,7 @@ Public Class EXO_COMPRAS
                         oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - Se actualiza la factura como enviada", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                     Else
                         'alerta al creador del doc
-                        smensaje = "Error al enviar correo electrónico: " + row.Item("CardCode").ToString()
+                        smensaje = "Error al enviar correo electrónico: " + row.Item("CardCode").ToString() & " - " & mensajeErrorCorreo
                         oObjGlobal.SBOApp.MessageBox(smensaje)
 
                         ''correo al creador del doc y al comercial
@@ -431,13 +451,20 @@ Public Class EXO_COMPRAS
         Dim StrFirma As String = ""
         Dim htmbody As New System.Text.StringBuilder()
         Dim cuerpo As String = ""
-
+        Dim sMail As String = ""
+        Dim sMailUS As String = "" : Dim sMailPASS As String = ""
+        Dim sMailSMTP As String = "" : Dim sMailPORT As String = ""
         Try
+            sMail = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail")
+            sMailUS = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_US")
+            sMailPASS = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_Pass")
+            sMailSMTP = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_SMTP")
+            sMailPORT = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_Port")
             Select Case empresa
                 'Case "SEMA_PROD" : correo.From = New System.Net.Mail.MailAddress("omartinez@expertone.es", "Prueba Solaria")
                 Case Else
-                    correo.From = New System.Net.Mail.MailAddress("facturas@solariaenergia.com", "Solaria Energía y Medio Ambiente")
-                    correo.CC.Add("facturas@solariaenergia.com")
+                    correo.From = New System.Net.Mail.MailAddress(sMail, "Solaria Energía y Medio Ambiente")
+                    correo.CC.Add(sMail)
             End Select
 
 
@@ -449,7 +476,7 @@ Public Class EXO_COMPRAS
             If mensajeErrorCorreo = "noEnviado" Then
                 'vuelvo a realizar la consulta y lo envio todo junto
                 correo.To.Clear()
-                correo.To.Add("facturas@solariaenergia.com")
+                'correo.To.Add("facturas@solariaenergia.com")
                 If dirmail <> "" Then
                     correo.To.Add(dirmail)
                 End If
@@ -498,7 +525,7 @@ Public Class EXO_COMPRAS
                 cuerpo &= strHeader & sbContent.ToString() & strFooter
                 correo.IsBodyHtml = True
                 correo.Body = cuerpo
-                correo.Priority = System.Net.Mail.MailPriority.High
+                correo.Priority = System.Net.Mail.MailPriority.Normal
                 correo.DeliveryNotificationOptions = Net.Mail.DeliveryNotificationOptions.OnSuccess
             End If
 
@@ -511,11 +538,14 @@ Public Class EXO_COMPRAS
                 '    smtp.Credentials = New System.Net.NetworkCredential("omartinez@expertone.es", "Osma@2021")
                 '    smtp.EnableSsl = True
                 Case Else
-                    smtp.Host = "smtp.office365.com"
-                    smtp.Port = 587
-                    smtp.UseDefaultCredentials = True
-                    smtp.Credentials = New System.Net.NetworkCredential("facturas@solariaenergia.com", "Guw56275")
+                    oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - smtp: " & sMailSMTP & " - Port: " & sMailPORT & " - TargetName: STARTTLS/smtp.office365.com - Mail: " & sMail & " - Usuario: " & sMailUS & " - Pass: " & sMailPASS, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
+
+                    smtp.UseDefaultCredentials = False
+                    smtp.Credentials = New System.Net.NetworkCredential(sMailUS, sMailPASS)
+                    smtp.Host = sMailSMTP
+                    smtp.Port = sMailPORT
                     smtp.EnableSsl = True
+                    smtp.TargetName = "STARTTLS/smtp.office365.com"
             End Select
 
             smtp.Send(correo)

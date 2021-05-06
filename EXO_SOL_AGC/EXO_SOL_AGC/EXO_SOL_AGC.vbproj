@@ -158,7 +158,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="XML_DB\UDO_EXO_IPC.xml" />
+    <EmbeddedResource Include="XML_DB\UDO_EXO_IPC.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="XML_DB\UDF_EXO_ODRF.xml">
