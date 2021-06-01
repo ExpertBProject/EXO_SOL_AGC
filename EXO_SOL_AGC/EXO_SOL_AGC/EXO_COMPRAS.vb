@@ -464,7 +464,7 @@ Public Class EXO_COMPRAS
                 'Case "SEMA_PROD" : correo.From = New System.Net.Mail.MailAddress("omartinez@expertone.es", "Prueba Solaria")
                 Case Else
                     correo.From = New System.Net.Mail.MailAddress(sMail, "Solaria Energía y Medio Ambiente")
-                    correo.CC.Add(sMail)
+                    'correo.CC.Add(sMail)
             End Select
 
 
