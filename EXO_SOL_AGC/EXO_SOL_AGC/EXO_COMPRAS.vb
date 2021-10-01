@@ -49,6 +49,9 @@ Public Class EXO_COMPRAS
             If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_Port") Then
                 objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_Port", "587")
             End If
+            If Not objGlobal.funcionesUI.refDi.OGEN.existeVariable("AGC_Mail_Notif") Then
+                objGlobal.funcionesUI.refDi.OGEN.fijarValorVariable("AGC_Mail_Notif", "N")
+            End If
         End If
     End Sub
     Public Overrides Function menus() As System.Xml.XmlDocument
@@ -454,12 +457,14 @@ Public Class EXO_COMPRAS
         Dim sMail As String = ""
         Dim sMailUS As String = "" : Dim sMailPASS As String = ""
         Dim sMailSMTP As String = "" : Dim sMailPORT As String = ""
+        Dim sMailNotif As String = ""
         Try
             sMail = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail")
             sMailUS = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_US")
             sMailPASS = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_Pass")
             sMailSMTP = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_SMTP")
             sMailPORT = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_Port")
+            sMailNotif = oObjGlobal.funcionesUI.refDi.OGEN.valorVariable("AGC_Mail_Notif")
             Select Case empresa
                 'Case "SEMA_PROD" : correo.From = New System.Net.Mail.MailAddress("omartinez@expertone.es", "Prueba Solaria")
                 Case Else
@@ -526,7 +531,14 @@ Public Class EXO_COMPRAS
                 correo.IsBodyHtml = True
                 correo.Body = cuerpo
                 correo.Priority = System.Net.Mail.MailPriority.Normal
-                correo.DeliveryNotificationOptions = Net.Mail.DeliveryNotificationOptions.OnSuccess
+                If sMailNotif = "Y" Then
+                    correo.DeliveryNotificationOptions = Net.Mail.DeliveryNotificationOptions.OnSuccess
+                ElseIf sMailNotif = "F" Then
+                    correo.DeliveryNotificationOptions = Net.Mail.DeliveryNotificationOptions.OnFailure
+                ElseIf sMailNotif = "N" Then
+                    correo.DeliveryNotificationOptions = Net.Mail.DeliveryNotificationOptions.None
+                End If
+
             End If
 
             Dim smtp As New System.Net.Mail.SmtpClient
