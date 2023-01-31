@@ -363,12 +363,15 @@ Public Class EXO_COMPRAS
             'oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - " & dFecha.ToString, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
             Dim iNumero As Integer = 0
             'Buscamos la ultima factura de año y le cogemos los digitos del final para sumar el numero
-            sSQL = "SELECT ""NumAtCard"", ""DocNum"" FROM """ & sBBDD & """.""OPCH"" where year(""TaxDate"")='" & dFecha.Year.ToString("0000") & "' and ""CANCELED""='N'"
+            sSQL = "SELECT IFNULL(""NumAtCard"",'0') ""NumAtCard"", ""DocNum"" FROM """ & sBBDD & """.""OPCH"" where year(""TaxDate"")='" & dFecha.Year.ToString("0000") & "' and ""CANCELED""='N'"
             sSQL &= " And ""CardCode""='" & row.Item("CardCode").ToString() & "' order by ""DocEntry"" desc "
             oRsFac.DoQuery(sSQL)
             If oRsFac.RecordCount > 0 Then
                 oRsFac.MoveFirst()
-                oRsFac.MoveNext()
+                If oRsFac.RecordCount > 1 Then
+                    oRsFac.MoveNext()
+                End If
+
                 Dim sTexto As String = "" : Dim sExtraeNum() As String
                 sTexto = oRsFac.Fields.Item("NumAtCard").Value.ToString
                 sExtraeNum = sTexto.Split("/")
