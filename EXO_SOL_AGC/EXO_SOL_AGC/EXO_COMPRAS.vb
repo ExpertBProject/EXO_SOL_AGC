@@ -304,7 +304,7 @@ Public Class EXO_COMPRAS
                     GestionarDoc(oObjGlobal, oCompany, row, sFicheroCrystal, sRutaFicheros, sTextoTipoDoc, sBBDD, tipodoc)
                 Next
             Else
-                oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - La documento no cumple los requisitos para ser enviado.", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
+                oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - El documento no cumple los requisitos para ser enviado.", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
             End If
 
         Catch exCOM As System.Runtime.InteropServices.COMException
