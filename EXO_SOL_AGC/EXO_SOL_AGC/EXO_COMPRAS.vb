@@ -277,6 +277,7 @@ Public Class EXO_COMPRAS
 #End Region
 
         Try
+            sRuta = oObjGlobal.path
             sRuta = oObjGlobal.pathHistorico & "\Report\"
 
             'Crear y validar carpetas, obtener rutas para los ficheros
@@ -640,7 +641,7 @@ Public Class EXO_COMPRAS
             GenerarPDFyEnviarCrystal = True
 
         Catch ex As Exception
-            sMensaje = "Crear PDF: " + ex.Message
+            sMensaje = "Crear PDF: " & strRutaInforme & " - " & ex.Message
             oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - " & sMensaje, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
             oObjGlobal.SBOApp.MessageBox(sMensaje)
         Finally
