@@ -290,7 +290,7 @@ Public Class EXO_COMPRAS
             End If
 
             'consulta para buscar documentos a realizar
-            Dim sSQL As String = " SELECT T0.""DocEntry"",T0.""DocNum"",T0.""TaxDate"", T0.""CardCode"",T0.""CardName"" , t1.""CardFName"", ifnull(t1.""E_Mail"",'') as ""CorreoProv"",  " &
+            Dim sSQL As String = " SELECT T0.""DocEntry"",T0.""DocNum"", T0.""NumAtCard"", T0.""TaxDate"", T0.""CardCode"",T0.""CardName"" , t1.""CardFName"", ifnull(t1.""E_Mail"",'') as ""CorreoProv"",  " &
                     " ifnull(t2.""Email"",'') as ""CorreoComercial"", t3.""USER_CODE"" as ""CodigoCreador"", t3.""E_Mail"" as ""CorreoCreador"" " &
                     " FROM """ & sBBDD & """.""" & tipodoc & """ T0 left join """ & sBBDD & """.""OCRD"" t1 on t0.""CardCode""=t1.""CardCode"" " &
                     " left join """ & sBBDD & """.""OSLP"" t2 on T0.""SlpCode""=t2.""SlpCode"" " &
@@ -362,35 +362,40 @@ Public Class EXO_COMPRAS
             Dim sSQL As String = ""
             Dim dFecha As Date = CDate(row.Item("TaxDate").ToString())
             'oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - " & dFecha.ToString, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
-            Dim iNumero As Integer = 0
-            'Buscamos la ultima factura de año y le cogemos los digitos del final para sumar el numero
-            sSQL = "SELECT IFNULL(""NumAtCard"",'0') ""NumAtCard"", ""DocNum"" FROM """ & sBBDD & """.""OPCH"" where year(""TaxDate"")='" & dFecha.Year.ToString("0000") & "' and ""CANCELED""='N'"
-            sSQL &= " And ""CardCode""='" & row.Item("CardCode").ToString() & "' order by ""DocEntry"" desc "
-            oRsFac.DoQuery(sSQL)
-            If oRsFac.RecordCount > 0 Then
-                oRsFac.MoveFirst()
-                If oRsFac.RecordCount > 1 Then
-                    oRsFac.MoveNext()
-                End If
-
-                Dim sTexto As String = "" : Dim sExtraeNum() As String
-                sTexto = oRsFac.Fields.Item("NumAtCard").Value.ToString
-                sExtraeNum = sTexto.Split("/")
-                For i As Integer = 0 To sExtraeNum.Length - 1
-                    If sExtraeNum(i) <> "" Then
-                        sTexto = sExtraeNum(i)
+            Dim iNumero As Integer = 0 : Dim sNumAtCard As String = ""
+            If row.Item("NumAtCard").ToString.Trim <> "" Then
+                sNumAtCard = row.Item("NumAtCard").ToString.Trim
+            Else
+                'Buscamos la ultima factura de año y le cogemos los digitos del final para sumar el numero
+                sSQL = "SELECT IFNULL(""NumAtCard"",'0') ""NumAtCard"", ""DocNum"" FROM """ & sBBDD & """.""OPCH"" where year(""TaxDate"")='" & dFecha.Year.ToString("0000") & "' and ""CANCELED""='N'"
+                sSQL &= " And ""CardCode""='" & row.Item("CardCode").ToString() & "' order by ""DocEntry"" desc "
+                oRsFac.DoQuery(sSQL)
+                If oRsFac.RecordCount > 0 Then
+                    oRsFac.MoveFirst()
+                    If oRsFac.RecordCount > 1 Then
+                        oRsFac.MoveNext()
                     End If
-                Next
-                If IsNumeric(sTexto) Then
-                    iNumero = CInt(sTexto)
+
+                    Dim sTexto As String = "" : Dim sExtraeNum() As String
+                    sTexto = oRsFac.Fields.Item("NumAtCard").Value.ToString
+                    sExtraeNum = sTexto.Split("/")
+                    For i As Integer = 0 To sExtraeNum.Length - 1
+                        If sExtraeNum(i) <> "" Then
+                            sTexto = sExtraeNum(i)
+                        End If
+                    Next
+                    If IsNumeric(sTexto) Then
+                        iNumero = CInt(sTexto)
+                    Else
+                        iNumero = 0
+                    End If
                 Else
                     iNumero = 0
                 End If
-            Else
-                iNumero = 0
+                iNumero += 1
+                sNumAtCard = dFecha.Year.ToString("0000") & "-" & row.Item("CardFName").ToString() & "/" & iNumero.ToString
             End If
-            iNumero += 1
-            Dim sNumAtCard As String = dFecha.Year.ToString("0000") & "-" & row.Item("CardFName").ToString() & "/" & iNumero.ToString
+
             'oObjGlobal.SBOApp.StatusBar.SetText("(EXO) - Nº Ref: " & sNumAtCard.ToString, SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
             'todo ok, en la funcion ya hemos escrito en el log
             sSQL = "UPDATE """ & sBBDD & """.""" & tipodoc & """ Set "
